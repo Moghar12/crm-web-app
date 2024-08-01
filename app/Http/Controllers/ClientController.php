@@ -7,9 +7,17 @@ use App\Models\Client;
 
 class ClientController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $clients = Client::all();
+        if (auth()->user()->isAdmin()) {
+            // Si l'utilisateur est un administrateur, afficher tous les clients
+            $clients = Lead::all();
+        } else {
+            // Sinon, afficher uniquement les clients assignés à l'agent connecté
+            $agentId = auth()->user()->agent->id;
+            $clients = Lead::where('agent_id', $agentId)->get();
+        }
+    
         return view('clients.index', compact('clients'));
     }
 
